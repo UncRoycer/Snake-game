@@ -16,7 +16,7 @@ yellow = (255, 255, 0)
 dis_width = 800
 dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Snake Game by Edureka')
+pygame.display.set_caption('Snake Game by Alen')
 
 # Game settings
 clock = pygame.time.Clock()
@@ -39,18 +39,18 @@ wall4 = pygame.Rect(dis_width - wall_thickness, 0, wall_thickness, dis_height)  
 walls = [wall1, wall2, wall3, wall4]
 
 # Load images
-food_image_original = pygame.image.load('Images/apple.png')
-grass_texture = pygame.image.load('Images/grass_texture.jpg')
+grass_texture = pygame.image.load('grass_texture.jpg')
 game_over_bg = pygame.image.load("jungle.jpg")
 
+# Scale game over background image
 game_over_bg = pygame.transform.scale(game_over_bg, (dis_width, dis_height))
 
+# Load and play background music
 pygame.mixer.music.load('background_music.mp3')
 pygame.mixer.music.play(-1)
 
-# Scale images
-apple_size = 15
-food_image = pygame.transform.scale(food_image_original, (apple_size, apple_size))
+munch_sound = pygame.mixer.Sound('munch_sound.mp3')
+crash_sound = pygame.mixer.Sound('crash_sound.mp3')
 
 # Define function to spawn apple away from walls
 def spawn_apple():
@@ -129,6 +129,7 @@ def gameLoop():
                     x1_change = 0
 
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
+            crash_sound.play()
             game_close = True
 
         x1 += x1_change
@@ -145,7 +146,8 @@ def gameLoop():
         for wall in walls:
             pygame.draw.rect(dis, wall_color, wall)
 
-        pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
+        # Draw apple as a red rectangle
+        pygame.draw.rect(dis, red, [foodx, foody, 15, 15])
 
         snake_Head = []
         snake_Head.append(x1)
@@ -156,12 +158,14 @@ def gameLoop():
 
         for x in snake_List[:-1]:
             if x == snake_Head:
+                crash_sound.play()
                 game_close = True
 
         our_snake(snake_block, snake_List)
         pygame.display.update()
 
         if x1 == foodx and y1 == foody:
+            munch_sound.play()
             foodx, foody = spawn_apple()
             Length_of_snake += 1
 
